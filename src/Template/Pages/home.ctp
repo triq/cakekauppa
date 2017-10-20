@@ -76,7 +76,7 @@ $cakeDescription = 'CakePHP: the rapid development PHP framework';
         <h4>Environment</h4>
         <ul>
         <?php if (version_compare(PHP_VERSION, '5.6.0', '>=')) : ?>
-            <li class="bullet success">Your version of PHP is 5.6.0 or higher (detected <?= PHP_VERSION ?>).</li>
+            <li class="bullet success">YourXXXXX version of PHP is 5.6.0 or higher (detected <?= PHP_VERSION ?>).</li>
         <?php else : ?>
             <li class="bullet problem">Your version of PHP is too low. You need PHP 5.6.0 or higher to use CakePHP (detected <?= PHP_VERSION ?>).</li>
         <?php endif; ?>
