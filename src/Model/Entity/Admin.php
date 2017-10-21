@@ -11,7 +11,7 @@ use Cake\ORM\Entity;
  * @property string $name
  * @property string $password
  */
-class User extends Entity
+class Admin extends Entity
 {
 
     /**

@@ -15,7 +15,7 @@ Router::scope('/products',
 });
 
 Router::scope('/admin', 
-    ['controller' => 'Users'],
+    ['controller' => 'Admins'],
     function ($routes) {
         $routes->connect('/*', ['action' => 'login']);
 });
