@@ -2,14 +2,8 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Controller\Component\AuthComponent;
 
-/**
- * Users Controller
- *
- * @property \App\Model\Table\UsersTable $Users
- *
- * @method \App\Model\Entity\User[] paginate($object = null, array $settings = [])
- */
 class AdminsController extends AppController
 {
 
@@ -17,95 +11,52 @@ class AdminsController extends AppController
         parent::initialize();
         $loginRedirect = '/products/';
         $this->Auth->config('loginRedirect', $loginRedirect);
-    }
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|void
-     */
-    public function index()
-    {
-        $users = $this->paginate($this->Admins);
-
-        $this->set(compact('admins'));
-        $this->set('_serialize', ['admins']);
-    }
-
-    /**
-     * View method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|void
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function view($id = null)
-    {
-        $user = $this->Admins->get($id, [
-            'contain' => []
+        $this->Auth->config('authenticate', [
+            AuthComponent::ALL => ['userModel' => 'Admins', 'passwordHasher' => 'Default'],
+            'Basic',
+            'Form'
         ]);
-
-        $this->set('user', $user);
-        $this->set('_serialize', ['user']);
     }
 
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
-     */
     public function add()
     {
-        $user = $this->Admins->newEntity();
+        $admin = $this->Admins->newEntity();
         if ($this->request->is('post')) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
-            if ($this->Users->save($user)) {
+            $admin = $this->Admins->patchEntity($admin, $this->request->getData());
+            if ($this->Admins->save($admin)) {
                 $this->Flash->success(__('The admin-user has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The admin-user could not be saved. Please, try again.'));
         }
-        $this->set(compact('user'));
-        $this->set('_serialize', ['user']);
+        $this->set(compact('admin'));
+        $this->set('_serialize', ['admin']);
     }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Network\Exception\NotFoundException When record not found.
-     */
     public function edit($id = null)
     {
-        $user = $this->Admins->get($id, [
+        $admin = $this->Admins->get($id, [
             'contain' => []
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $user = $this->Admins->patchEntity($user, $this->request->getData());
-            if ($this->Admins->save($user)) {
+            $admin = $this->Admins->patchEntity($admin, $this->request->getData());
+            if ($this->Admins->save($admin)) {
                 $this->Flash->success(__('The admin-user has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The admin-user could not be saved. Please, try again.'));
         }
-        $this->set(compact('user'));
-        $this->set('_serialize', ['user']);
+        $this->set(compact('admin'));
+        $this->set('_serialize', ['admin']);
     }
 
-    /**
-     * Delete method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $user = $this->Admins->get($id);
-        if ($this->Users->delete($user)) {
+        $admin = $this->Admins->get($id);
+        if ($this->Admins->delete($admin)) {
             $this->Flash->success(__('The admin-user has been deleted.'));
         } else {
             $this->Flash->error(__('The admin-user could not be deleted. Please, try again.'));
@@ -114,11 +65,12 @@ class AdminsController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
+    /* Common login with authentication, post-form. */
     public function login() {
         if($this->request->is('post')) {
-            $user = $this->Auth->identify();
-            if($user) {
-                $this->Auth->setAdmin($user);
+            $admin = $this->Auth->identify();
+            if($admin) {
+                $this->Auth->setAdmin($admin);
                 return $this->redirect($this->Auth->redirectUrl());
             }
 

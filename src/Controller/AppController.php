@@ -53,10 +53,14 @@ class AppController extends Controller
             ]
         ],
         'loginAction' => [
-            'controller' => 'Users',
+            'controller' => 'Admins',
             'action' => 'login'
             ]
         ]);
+
+        $this->Auth->allow(
+            ['controller' => 'pages', 'action' => 'display', 'home']
+        );
 
         /*
          * Enable the following components for recommended CakePHP security settings.
