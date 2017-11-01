@@ -53,6 +53,11 @@ class ProductsTable extends Table
             ->notEmpty('name');
 
         $validator
+            ->double('price')
+            ->requirePresence('price', 'create')
+            ->default('price');
+
+        $validator
             ->scalar('product_code')
             ->requirePresence('product_code', 'create')
             ->notEmpty('product_code')

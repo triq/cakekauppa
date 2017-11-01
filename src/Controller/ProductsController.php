@@ -35,6 +35,8 @@ class ProductsController extends AppController
      */
     public function view($id = null)
     {
+        $id = $this->request->getParam('id');
+
         $product = $this->Products->get($id, [
             'contain' => []
         ]);

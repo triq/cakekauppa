@@ -30,11 +30,6 @@ class AppController extends Controller
 
     /**
      * Initialization hook method.
-     *
-     * Use this method to add common initialization code like loading components.
-     *
-     * e.g. `$this->loadComponent('Security');`
-     *
      * @return void
      */
     public function initialize()
@@ -58,8 +53,18 @@ class AppController extends Controller
             ]
         ]);
 
+        // Allow all actions
+        $this->Auth->allow();
+        /*
         $this->Auth->allow(
-            ['controller' => 'pages', 'action' => 'display', 'home']
+            ['controller' => 'pages', 'action' => 'display', 'home'],
+            ['controller' => 'products' ],
+            ['url' => '/']
+        );
+        */
+        $this->Auth->deny(
+            ['controller' => 'admin'],
+            ['controller' => 'products', 'action' => 'edit', 'add']
         );
 
         /*
@@ -69,28 +74,6 @@ class AppController extends Controller
         //$this->loadComponent('Security');
         //$this->loadComponent('Csrf');
     }
-
-/*
-    public $components = array(
-        'Flash',
-        'Auth' => array(
-            'loginRedirect' => array(
-                'controller' => 'posts',
-                'action' => 'index'
-            ),
-            'logoutRedirect' => array(
-                'controller' => 'pages',
-                'action' => 'display',
-                'home'
-            ),
-            'authenticate' => array(
-                'Form' => array(
-                    'passwordHasher' => 'Blowfish'
-                )
-            )
-        )
-    );
-*/
 
     /**
      * Before render callback.
@@ -109,4 +92,14 @@ class AppController extends Controller
             $this->set('_serialize', true);
         }
     }
+
+    public function beforeFilter(\Cake\Event\Event $event) {
+        parent::beforeFilter($event);
+        //$this->loadModel('Cart');
+
+
+        //$this->set('count',$this->Cart->getCount());
+        $this->set('count',0);
+    }
+
 }
