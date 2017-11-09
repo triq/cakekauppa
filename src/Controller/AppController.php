@@ -16,6 +16,7 @@ namespace App\Controller;
 
 use Cake\Controller\Controller;
 use Cake\Event\Event;
+use Cake\I18n\Time;
 
 /**
  * Application Controller
@@ -27,6 +28,7 @@ use Cake\Event\Event;
  */
 class AppController extends Controller
 {
+    public $uses = array('Cart');
 
     /**
      * Initialization hook method.
@@ -66,13 +68,6 @@ class AppController extends Controller
             ['controller' => 'admin'],
             ['controller' => 'products', 'action' => 'edit', 'add']
         );
-
-        /*
-         * Enable the following components for recommended CakePHP security settings.
-         * see https://book.cakephp.org/3.0/en/controllers/components/security.html
-         */
-        //$this->loadComponent('Security');
-        //$this->loadComponent('Csrf');
     }
 
     /**
@@ -97,9 +92,30 @@ class AppController extends Controller
         parent::beforeFilter($event);
         //$this->loadModel('Cart');
 
+        $session = $this->request->session();
 
-        //$this->set('count',$this->Cart->getCount());
-        $this->set('count',0);
+        $session->write('Cart.gvalue','testi');
+        $session->write('Config.language', 'en');
+
+        var_dump("session: ");
+        //var_dump($session);
+        var_dump($session->read('Config'));
+        $count = 0;
+        //$count = $this->Cart->getCount($session);
+        $this->set('count', $count);
+        //$this->set('count',0);
+
+        var_dump('__Session: ');
+        //var_dump($_SESSION);
+        $data1 = array();
+        $data1 = $session->read('test.time.');
+        $t = Time::now();
+        array_push($data1, $t);
+        //add new time item
+        $session->write('test.time.', $data1);
+
+        print_r('test.time.: '. join(',', $session->read('test.time.')) .", count=". (int)count($session->read('test.time.')));
+
     }
 
 }

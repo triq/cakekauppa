@@ -6,6 +6,11 @@ use Cake\Controller\Component\AuthComponent;
 
 class AdminsController extends AppController
 {
+    public function beforeFilter(\Cake\Event\Event $event)
+    {
+        parent::beforeFilter($event);
+        $this->Auth->allow(['logout']);
+    }
 
     public function initialize() {
         parent::initialize();
@@ -18,69 +23,23 @@ class AdminsController extends AppController
         ]);
     }
 
-    public function add()
-    {
-        $admin = $this->Admins->newEntity();
-        if ($this->request->is('post')) {
-            $admin = $this->Admins->patchEntity($admin, $this->request->getData());
-            if ($this->Admins->save($admin)) {
-                $this->Flash->success(__('The admin-user has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The admin-user could not be saved. Please, try again.'));
-        }
-        $this->set(compact('admin'));
-        $this->set('_serialize', ['admin']);
-    }
-
-    public function edit($id = null)
-    {
-        $admin = $this->Admins->get($id, [
-            'contain' => []
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $admin = $this->Admins->patchEntity($admin, $this->request->getData());
-            if ($this->Admins->save($admin)) {
-                $this->Flash->success(__('The admin-user has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The admin-user could not be saved. Please, try again.'));
-        }
-        $this->set(compact('admin'));
-        $this->set('_serialize', ['admin']);
-    }
-
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $admin = $this->Admins->get($id);
-        if ($this->Admins->delete($admin)) {
-            $this->Flash->success(__('The admin-user has been deleted.'));
-        } else {
-            $this->Flash->error(__('The admin-user could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
-    }
-
     /* Common login with authentication, post-form. */
     public function login() {
         if($this->request->is('post')) {
             $admin = $this->Auth->identify();
             if($admin) {
+                var_dump($admin);
                 $this->Auth->setAdmin($admin);
                 return $this->redirect($this->Auth->redirectUrl());
             }
 
             //User not identified
-            $this->Flash->error('Your username or password is incorrect');
+            $this->Flash->error('Salasana tai nimi väärin!');
         }
     }
 
     public function logout() {
-        $this->Flash->success("You are now logged out.");
+        $this->Flash->success("Kirjautunut ulos.");
         return $this->redirect($this->Auth->logout());
     }
 }
