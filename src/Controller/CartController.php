@@ -6,75 +6,124 @@
  * Time: 15:23
  */
 
+
 namespace App\Controller;
 
+use App\Controller\AppController;
 use Cake\ORM\TableRegistry;
 //debug purpose
 use Cake\I18n\Time;
+use Controller\Component\CartProductComponent;
+use App\Model\Entity\CartProduct;
+use App\Controller\AppController;
+use Controller\Component\CartProductComponent;
+use App\Model\Entity\CartProduct;
 
 
 class CartController extends AppController
 {
     public $uses = array('Product','Cart');
 
-    public function add() {
-        var_dump('__session: ');
-        var_dump($_SESSION);
+    // In your controller.
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('CartProduct');
+    }
 
-        $productId = $this->request->session()->read('Cart.product_id');
-        if($productId == null) {
-            $productId = -1;
-        }
+    public function add() {
+        $session = $this->request->session();
 
         $this->autoRender = false;
-        $session = $this->request->session();
-        $time = Time::now();
-        $cart_tag = 'test.time';
-        $count = count($session->read($cart_tag));
-        $session->write($cart_tag .'.', $time);
+        $productId = null;
         if ($this->request->is('post')) {
-            $this->Cart->addProduct($productId, $session);
+            // An input with a name attribute equal to 'MyModel[title]' is accessible at
+            //$title = $this->request->getData('MyModel.title');
+            $productId = $this->request->getData('add_product_id');
         }
-        echo $this->Cart->getCount($session);
+
+        $cart_tag = 'Cart1.product_id';
+        if($productId == null) {
+            $productId = -1;
+            $this->Flash->error('Tuotteen lisäys epäonnistui! (ei tuotekoodia)');
+        } else {
+            $session = $this->request->session();
+            $this->Cart->addProduct($productId, $session);
+            echo $this->Cart->getCount($session);
+            $this->Flash->success('Tuotteen lisäys onnistui.');
+        }
+
+        $prods = $session->read($cart_tag);
+        if($prods == null) {
+            $prods = array();
+        }
+        if(array_key_exists($productId,$prods)) {
+            $prods[$productId]++;
+        } else {
+            $prods[$productId] = 1;
+        }
+        $session->write($cart_tag, $prods);
+
+        $this->redirect('/');
     }
 
     public function view() {
         $this->Products = TableRegistry::get('Products');
 
         $session = $this->request->session();
-        $carts = $this->Cart->readProduct($session);
+        $carts = $this->Cart->readProducts($session);
         $products = array();
         if (null!=$carts) {
-            var_dump('carts, _session: ');
-            var_dump($carts);
-            var_dump($_SESSION);
-            var_dump('prodcut-id: '. (int)$session->read('productId'));
             foreach ($carts as $productId => $count) {
-                //$users = $this->paginate($this->Users);
-                var_dump('prodId: '. $productId);
-                $p1 = $this->Products->get($productId);
-                $p = $this->paginate($this->Products);
-                $product = $p->get($productId);
-                $product['Product']['count'] = $count;
-                $products[]=$product;
+                $p1 = $this->Products->findById($productId);
+                $product = $p1->first();
+                if($product != null) {
+                    $cp = new CartProduct($product->toArray());
+                    $cp->setProduct($product);
+                    $cp->setCount($count);
+                    $products[] = $cp;
+                }
             }
         }
-        $this->set(compact('products'));
+        $this->set('products', $products);
     }
 
     public function update() {
         if ($this->request->is('post')) {
             if (!empty($this->request->data)) {
                 $cart = array();
-                foreach ($this->request->data['Cart']['count'] as $index=>$count) {
-                    if ($count>0) {
-                        $productId = $this->request->data['Cart']['product_id'][$index];
+                $cart1 = $this->request->data['Cart']['update'];
+                $column_id = array_column($cart1, 'product_id');
+                $column_count = array_column($cart1, 'count');
+                for ($i = 0; $i < count($column_count); $i++) {
+                    $cc = $column_count[$i];
+                    var_dump('index-x: '. $i);
+                    $count = $cc;
+                    if ($count>=0) {
+                        $productId = $column_id[$i];
                         $cart[$productId] = $count;
                     }
                 }
-                $this->Cart->saveProduct($cart);
+                $session = $this->request->session();
+                $this->Cart->updateCart($session, $cart1);
             }
         }
+
+        $this->autoRender = false;
+
         $this->redirect(array('action'=>'view'));
     }
+
+    public function deleteCart() {
+        $this->Cart->deleteCart($this->request->session());
+        $this->redirect(array('action'=>'view'));
+    }
+
+    public function destroySession() {
+        $session = $this->request->session();
+        $session->delete('Cart');
+        $session->delete('Cart1');
+        $this->redirect('/');
+    }
+
 }
