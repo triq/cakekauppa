@@ -17,6 +17,9 @@ namespace App\Controller;
 use Cake\Controller\Controller;
 use Cake\Event\Event;
 use Cake\I18n\Time;
+use Cake\Controller\Component\AuthComponent;
+use function MongoDB\BSON\toJSON;
+
 
 /**
  * Application Controller
@@ -37,36 +40,40 @@ class AppController extends Controller
     public function initialize()
     {
         parent::initialize();
+        $loginRedirect = '/products/add';
 
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Flash');
         $this->loadComponent('Auth', [
             'authenticate' => [
-            'Form' => [
-                'fields' => [
-                'username' => 'name',
-                'password' => 'password'
-                ]
-            ]
-        ],
-        'loginAction' => [
-            'controller' => 'Admins',
-            'action' => 'login'
-            ]
+                'Form' => [
+                    'fields' => [
+                        'username' => 'name',
+                        'password' => 'password'
+                    ],
+                    'passwordHasher' => [
+                        'className' => 'Default',
+                    ],
+                    'userModel' => 'Admins',
+                ],
+            ],
+            'loginAction' => [
+                'controller' => 'Admins',
+                'action' => 'login'
+            ],
+
+            'loginRedirect' => $loginRedirect
         ]);
 
         // Allow all actions
         $this->Auth->allow();
-        /*
-        $this->Auth->allow(
-            ['controller' => 'pages', 'action' => 'display', 'home'],
-            ['controller' => 'products' ],
-            ['url' => '/']
-        );
-        */
         $this->Auth->deny(
             ['controller' => 'admin'],
-            ['controller' => 'products', 'action' => 'edit', 'add']
+            ['controller' => 'products',
+                'action' => 'edit'],
+            ['controller' => 'products',
+                    'action' => 'add'
+            ]
         );
     }
 
@@ -90,32 +97,27 @@ class AppController extends Controller
 
     public function beforeFilter(\Cake\Event\Event $event) {
         parent::beforeFilter($event);
-        //$this->loadModel('Cart');
 
         $session = $this->request->session();
-
-        $session->write('Cart.gvalue','testi');
         $session->write('Config.language', 'en');
 
-        var_dump("session: ");
-        //var_dump($session);
-        var_dump($session->read('Config'));
-        $count = 0;
-        //$count = $this->Cart->getCount($session);
-        $this->set('count', $count);
-        //$this->set('count',0);
+        $this->loadModel('Cart');
+        $cart_product_count = $this->Cart->getCount($session);
+        $this->set('cart_product_count', $cart_product_count);
 
-        var_dump('__Session: ');
-        //var_dump($_SESSION);
-        $data1 = array();
-        $data1 = $session->read('test.time.');
-        $t = Time::now();
-        array_push($data1, $t);
-        //add new time item
-        $session->write('test.time.', $data1);
+        //USER LOGGED IN:
+        $logged_user = $this->Auth->user();
+        if($logged_user != null) {
+            $logged_user = $logged_user['name'];
+        }
+        $this->set('logged_user', $logged_user);
+        $this->set('session_u', $session->id());
+        $this->set('cart_data', $session->read('Cart'));
+        $this->set('cart_data1', $session->read('Cart1'));
 
-        print_r('test.time.: '. join(',', $session->read('test.time.')) .", count=". (int)count($session->read('test.time.')));
+        $g = $session->read('Cart');
 
+        $this->set('logged_user', $logged_user);
     }
 
 }
