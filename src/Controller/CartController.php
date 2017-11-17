@@ -9,15 +9,10 @@
 
 namespace App\Controller;
 
-use App\Controller\AppController;
 use Cake\ORM\TableRegistry;
-//debug purpose
-use Cake\I18n\Time;
 use Controller\Component\CartProductComponent;
 use App\Model\Entity\CartProduct;
 use App\Controller\AppController;
-use Controller\Component\CartProductComponent;
-use App\Model\Entity\CartProduct;
 
 
 class CartController extends AppController
@@ -38,7 +33,6 @@ class CartController extends AppController
         $productId = null;
         if ($this->request->is('post')) {
             // An input with a name attribute equal to 'MyModel[title]' is accessible at
-            //$title = $this->request->getData('MyModel.title');
             $productId = $this->request->getData('add_product_id');
         }
 
@@ -49,7 +43,6 @@ class CartController extends AppController
         } else {
             $session = $this->request->session();
             $this->Cart->addProduct($productId, $session);
-            echo $this->Cart->getCount($session);
             $this->Flash->success('Tuotteen lisäys onnistui.');
         }
 
@@ -64,7 +57,7 @@ class CartController extends AppController
         }
         $session->write($cart_tag, $prods);
 
-        $this->redirect('/');
+       $this->redirect('/');
     }
 
     public function view() {

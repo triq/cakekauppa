@@ -29,7 +29,6 @@ class CartTable extends Table
      */
     public function addProduct($productId, \Cake\Network\Session $session) {
         $allProducts = $this->readProducts($session);
-        $this->createCart($session);
         //create cart, it doesnt exist
         if($allProducts == null) {
 
@@ -38,9 +37,8 @@ class CartTable extends Table
             die('productId on 0! _'. (int)$productId ."_");
         }
 
-      $amount = -100;
+        $amount = -100;
         if (null!=$allProducts) {
-            var_dump('prodID: '. $productId);
             if (array_key_exists($productId, $allProducts)) {
                 $amount = 1;
                 if (is_array($allProducts[$productId])) {

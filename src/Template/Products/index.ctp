@@ -28,7 +28,7 @@
                         'controller' => 'products',
                         'action' => 'view',
                         $product->id,
-                        '?' => ['height' => 400, 'width' => 500]
+                        //'?' => ['height' => 400, 'width' => 500]
                     ]); ?>
                 </td>
                 <td><div class="col-lg-5 col-md-5">
