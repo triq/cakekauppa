@@ -34,8 +34,13 @@ $cakeDescription = 'Cake-kauppa: Yksinkertainen verkkokauppademo.';
     <nav class="top-bar expanded" data-topbar role="navigation">
         <div class="top-bar-section">
             <ul class="right">
-                <li><?= $this->Html->link('<span class="glyphicon glyphicon-shopping-cart"></span>Ostoskori <span class="badge" id="cart-counter">'.$count.'</span>',
+                <li><?= $this->Html->link('<span class="glyphicon glyphicon-shopping-cart"></span>Ostoskori <span class="badge" id="cart-counter">'.$cart_product_count.'</span>',
                     array('controller'=>'cart','action'=>'view'),array('escape'=>false));?></li>
+                <li>USER: <b><i><?= $logged_user ? $logged_user : "ei käyttäjää" ?></i> <?= $logged_user ? $this->Html->link('kirjaudu ulos', '/admin/logout') : "" ?> </b></li>
+                <li>sessio: <b><i><?= $session_u; ?></i> <?= $this->Html->link('Tuhoa sessio', '/cart/destroysession'); ?></b></li>
+                <li>Cart(sessio-data): <b><i><?= print_r($cart_data); ?></i></b></li>
+                <li>Cart1(sessio-data): <b><i><?= print_r($cart_data1); ?></i></b></li>
+                <li><?= $this->Html->link(__('Tuotelistaus'), '/') ?></li>
             </ul>
         </div>
     </nav>

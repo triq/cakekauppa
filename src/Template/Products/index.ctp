@@ -33,7 +33,7 @@
                 </td>
                 <td><div class="col-lg-5 col-md-5">
                     <?= $this->Form->create('Cart',array('id'=>'add-form','url'=>array('controller'=>'cart','action'=>'add')));?>
-                    <?= $this->Form->hidden('product_id',array('value'=>$product->id))?>
+                    <?= $this->Form->hidden('add_product_id',array('value'=>$product->id))?>
                     <?= $this->Form->submit('Koriin',array('class'=>'btn-success btn btn-lg'));?>
                     <?= $this->Form->end();?>
                 </div>
