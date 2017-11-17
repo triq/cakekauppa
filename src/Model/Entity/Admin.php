@@ -14,18 +14,14 @@ use Cake\ORM\Entity;
 class Admin extends Entity
 {
 
-    /*
     protected $_accessible = [
         'name' => true,
         'password' => true
     ];
-    */
-    protected $_accessible = [*];
-    /*
+
     protected $_hidden = [
         'password'
     ];
-    */
 
     protected function _setPassword($value) {
         if (strlen($value) <= 0) {

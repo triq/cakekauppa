@@ -48,4 +48,12 @@ class AdminsTable extends Table
 
         return $validator;
     }
+
+    public function findAuth(\Cake\ORM\Query $query, array $options)
+    {
+        $query
+            ->select(['id', 'username', 'password']);
+
+        return $query;
+    }
 }
