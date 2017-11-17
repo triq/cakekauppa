@@ -2,7 +2,9 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Auth\DefaultPasswordHasher;
 use Cake\Controller\Component\AuthComponent;
+use \App\Auth\LegacyPasswordHasher;
 
 class AdminsController extends AppController
 {
@@ -12,24 +14,24 @@ class AdminsController extends AppController
         $this->Auth->allow(['logout']);
     }
 
-    public function initialize() {
-        parent::initialize();
-        $loginRedirect = '/products/';
-        $this->Auth->config('loginRedirect', $loginRedirect);
-        $this->Auth->config('authenticate', [
-            AuthComponent::ALL => ['userModel' => 'Admins', 'passwordHasher' => 'Default'],
-            'Basic',
-            'Form'
-        ]);
-    }
-
     /* Common login with authentication, post-form. */
     public function login() {
         if($this->request->is('post')) {
+            $u = $_POST['name'];
+            $p0 = $_POST['password'];
+
+
+            $x = $this->loadModel('Admins');
+            $q = $x->find('all')
+                ->where(['Admins.name =' => $u]);
+            $results = $q->all();
+            $a1 = $results->first();
+
+            $d = new DefaultPasswordHasher();
+            $f = $d->check($p0, $a1->password);
             $admin = $this->Auth->identify();
             if($admin) {
-                var_dump($admin);
-                $this->Auth->setAdmin($admin);
+                $this->Auth->setUser($admin);
                 return $this->redirect($this->Auth->redirectUrl());
             }
 
@@ -39,6 +41,7 @@ class AdminsController extends AppController
     }
 
     public function logout() {
+        $this->Auth->logout();
         $this->Flash->success("Kirjautunut ulos.");
         return $this->redirect($this->Auth->logout());
     }
